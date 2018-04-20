@@ -1,5 +1,6 @@
 package com.example.sigit.test2;
 
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -37,6 +38,22 @@ public class GamePlayer implements GameObject {
     {
 
     }
+    @Override
+    public Rect boundingRect()
+    {
+        return rectangle;
+    }
+    @Override
+    public Vector getVector()
+    {
+        return vector;
+    }
+    @Override
+    public void setVector(Vector vector)
+    {
+        this.vector = vector;
+    }
+
     public void update(Point point)
     {
         if(rectangle.centerX() < point.x)   //move right
@@ -61,6 +78,9 @@ public class GamePlayer implements GameObject {
 
 
         }
-
     }
+
+
+
+
 }

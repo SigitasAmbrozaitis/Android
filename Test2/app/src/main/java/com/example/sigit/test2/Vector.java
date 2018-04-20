@@ -30,14 +30,29 @@ public class Vector {
 
     public void transformVector(HitLocation location)
     {
-
         if(location == HitLocation.Side){ x = x * (-1); }
         if(location == HitLocation.Floor){y = y * (-1); }
     }
     public void converToSingle()
     {
-        float max = x<y? x:y;
-        x = x/max;
-        y = y/max;
+        float max = 0;
+        if(x < y)
+        {
+            max = y;
+        }else
+        {
+            max = x;
+        }
+        if(max>1)
+        {
+            x = x/max;
+            y = y/max;
+        }
+    }
+    public void addVector(Vector vector)
+    {
+        this.x += vector.getX();
+        this.y += vector.getY();
+        //converToSingle();
     }
 }

@@ -3,6 +3,7 @@ package com.example.sigit.test2;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 
 public class GameBall implements GameObject {
 
@@ -37,6 +38,7 @@ public class GameBall implements GameObject {
 
     }
 
+
     @Override
     public void update()
     {
@@ -45,11 +47,34 @@ public class GameBall implements GameObject {
             x += vector.getX();
             y += vector.getY();
 
+            //collision with wall
             if(x + range >= winSize.x){ vector.transformVector(HitLocation.Side);   }       //collides with right wall
             else if(x - range <= 0){ vector.transformVector(HitLocation.Side);  }           //collides with left wall
             else if(y + range >= winSize.y){ vector.transformVector(HitLocation.Floor);  }  //collides with bottom wall
             else if(y - range <= 0){ vector.transformVector(HitLocation.Floor);  }          //collides with top wall
 
         }
+    }
+
+    @Override
+    public Rect boundingRect()
+    {
+        Rect value = new Rect((int)(x-range), (int)(y-range), (int)(x+range), (int)(y+range));
+        return value;
+    }
+    @Override
+    public Vector getVector()
+    {
+        return vector;
+    }
+    @Override
+    public void setVector(Vector vector)
+    {
+        this.vector = vector;
+    }
+
+    public float getRange()
+    {
+        return range;
     }
 }
