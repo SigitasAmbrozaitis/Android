@@ -53,6 +53,16 @@ public class Vector {
     {
         this.x += vector.getX();
         this.y += vector.getY();
-        //converToSingle();
+        converToSingle();
+    }
+    public void setVector(float x, float y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+    public void setVector(Vector vector)
+    {
+        this.x = vector.x;
+        this.y = vector.y;
     }
 }

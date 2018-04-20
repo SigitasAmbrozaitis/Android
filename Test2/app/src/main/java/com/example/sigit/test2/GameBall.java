@@ -14,9 +14,10 @@ public class GameBall implements GameObject {
     private int color;
     private Paint paint;
     private Vector vector;
-    private int speed = 1;
+    private int speed = 20;
     private int maxSpeed=60;
     private Point winSize;
+    private boolean hit = false;
 
     public GameBall(Point location, float range, int color, Point winSize)
     {
@@ -55,6 +56,8 @@ public class GameBall implements GameObject {
             else if(x - range <= 0){ vector.transformVector(HitLocation.Side);  }           //collides with left wall
             else if(y + range >= winSize.y){ vector.transformVector(HitLocation.Floor); dead = true;}  //collides with bottom wall
             else if(y - range <= 0){ vector.transformVector(HitLocation.Floor);  }          //collides with top wall
+            //TODO implement for break if colliion is detected
+
         }
     }
 
@@ -93,5 +96,10 @@ public class GameBall implements GameObject {
         {
             ++speed;
         }
+    }
+
+    public void setHit(boolean hit)
+    {
+        this.hit = hit;
     }
 }

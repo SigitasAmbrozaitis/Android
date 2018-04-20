@@ -47,7 +47,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         //setup ball
         Point ballPoint = new Point(point.x, point.y-50);
-        ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(255,255,0), winSize);
+        ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(0,255,0), winSize);
 
         //setup HUD
         hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5), Color.GRAY);
@@ -136,40 +136,70 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ball.update();
         hud.update();
 
+        HitCoordinate coordinate = new HitCoordinate(0,new Rect(0,0,0,0));
         HitLocation result = HitLocation.None;
+
         //check collision with player
-        result = checkCollision(player, ball);
+        result = checkCollision(player, ball, coordinate);
         if(result != HitLocation.None)
         {
-            Vector vector = ball.getVector();
-            vector.transformVector(result);
-            ball.setVector(vector);
-            ball.increaseSpeed();
-        }
-
-        //check collision with hud
-        result = checkCollision(hud, ball);
-        if(result != HitLocation.None)
-        {
-            Vector vector = ball.getVector();
-            vector.transformVector(result);
-            ball.setVector(vector);
-        }
-
-        //check colliosion with bricks
-        for(GameBlock block : blocks)
-        {
-            result = checkCollision(block, ball);
-            if(result != HitLocation.None)
+            System.out.println(coordinate.calculateAngle());
+            if(coordinate.isChanged())
+            {
+                Vector vector = coordinate.getBounceVector();
+                //vector.addVector(player.getVector());
+                ball.setVector(vector);
+                coordinate.setChanged(false);
+            }else
             {
                 Vector vector = ball.getVector();
                 vector.transformVector(result);
                 ball.setVector(vector);
 
-                block.setRectangle(new Rect(0,0,0,0));
-                blocks.remove(block);
             }
+            ball.setHit(true);
+            ball.increaseSpeed();
         }
+
+        //check collision with hud
+        result = checkCollision(hud, ball, coordinate);
+        if(result != HitLocation.None)
+        {
+            Vector vector = ball.getVector();
+            vector.transformVector(result);
+            ball.setVector(vector);
+            ball.setHit(true);
+        }
+
+        //check colliosion with bricks
+        GameBlock blockToDelete=null;
+        for(GameBlock block : blocks)
+        {
+            block.update();
+            result = checkCollision(block, ball, coordinate);
+            if(result != HitLocation.None)
+            {
+                Vector vector = ball.getVector();
+                vector.transformVector(result);
+                ball.setVector(vector);
+                ball.setHit(true);
+
+                block.setRectangle(new Rect(0,0,0,0));
+                blockToDelete = block;
+                //blocks.remove(block);
+            }
+
+
+        }
+        if(blockToDelete!=null)
+        {
+            blocks.remove(blockToDelete);
+            blockToDelete = null;
+        }
+
+
+
+
 
         //game end conditions
         if(blocks.isEmpty())
@@ -183,7 +213,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public HitLocation checkCollision(GameObject object1,GameBall object2)
+    public HitLocation checkCollision(GameObject object1,GameBall object2, HitCoordinate coordinate)
     {
         HitLocation hitRegistered = HitLocation.None;
         Rect rect1 = object1.boundingRect();
@@ -202,7 +232,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.top >= rect2.top && rect1.top <= rect2.bottom)//1 hit top
         {
             hitRegistered = HitLocation.Floor;
-            hitX = object2.getX();
+            coordinate.setHitCoordinate(object2.getX(),new Rect(rect1.left, rect1.top, rect1.right, rect1.bottom));
+
         }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.bottom <= rect2.bottom && rect1.bottom >= rect2.top)//3 hit bot
         {
             hitRegistered = HitLocation.Floor;
@@ -211,11 +242,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
             hitRegistered = HitLocation.Floor;
-            hitX = object2.getX();
+            //coordinate = new HitCoordinate(object2.getX(),rect1);
         }else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.right >= rect2.left && rect1.right <= rect2.right)
         {
             hitRegistered = HitLocation.Floor;
-            hitX = object2.getX();
+            //coordinate = new HitCoordinate(object2.getX(),rect1);
         }else if(rect1.bottom >= rect2.top && rect1.bottom <=rect2.bottom && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
             hitRegistered = HitLocation.Side;
