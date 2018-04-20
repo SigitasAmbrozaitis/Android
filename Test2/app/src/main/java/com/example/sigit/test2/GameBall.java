@@ -77,4 +77,8 @@ public class GameBall implements GameObject {
     {
         return range;
     }
+
+    public float getX() {
+        return x;
+    }
 }

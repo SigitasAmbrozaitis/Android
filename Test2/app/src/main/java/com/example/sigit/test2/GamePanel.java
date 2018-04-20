@@ -106,66 +106,64 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     {
         player.update(point);
         ball.update();
-        checkCollision(player, ball);
+
+
+        HitLocation result = HitLocation.None;
+        result = checkCollision(player, ball);
+        if(result != HitLocation.None)
+        {
+            Vector vector = ball.getVector();
+            vector.transformVector(result);
+            ball.setVector(vector);
+
+            System.out.println(result);
+        }
+
 
     }
 
-    public void checkCollision(GameObject object1,GameBall object2)
+    public HitLocation checkCollision(GameObject object1,GameBall object2)
     {
+        HitLocation hitRegistered = HitLocation.None;
         Rect rect1 = object1.boundingRect();
         Rect rect2 = object2.boundingRect();
-        Rect result = new Rect(0,0,0,0);
-
-        Vector vector1 = object1.getVector();
-        Vector vector2 = object2.getVector();
-
         float range = object2.getRange();
 
+        float hitX = 0;
 
+        //if ball hits wall : range going diagnoly/horizontal from center to side
         if(rect1.top-range <= rect2.top && rect2.bottom+range >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)// 2 hit right side
         {
-            vector2.transformVector(HitLocation.Side);
-            //vector2.addVector(vector1);
-            object2.setVector(vector2);
-            System.out.println("hit right");
+            hitRegistered = HitLocation.Side;
         }else if(rect1.top - range <= rect2.top && rect2.bottom +range >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//4 hit left side
         {
-            vector2.transformVector(HitLocation.Side);
-            //vector2.addVector(vector1);
-            object2.setVector(vector2);
-            System.out.println("hit left");
+            hitRegistered = HitLocation.Side;
         }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.top >= rect2.top && rect1.top <= rect2.bottom)//1 hit top
         {
-            vector2.transformVector(HitLocation.Floor);
-            //vector2.addVector(vector1);
-            object2.setVector(vector2);
-            System.out.println("hit top");
+            hitRegistered = HitLocation.Floor;
+            hitX = object2.getX();
         }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.bottom <= rect2.bottom && rect1.bottom >= rect2.top)//3 hit bot
         {
-            vector2.transformVector(HitLocation.Floor);
-            //vector2.addVector(vector1);
-            object2.setVector(vector2);
-            System.out.println("hit bot");
+            hitRegistered = HitLocation.Floor;
+        }
+        //if ball hits wall: range cannot go diagnolly/horizontaly from center to side
+        else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.left <= rect2.right && rect1.left >= rect2.left)
+        {
+            hitRegistered = HitLocation.Floor;
+            hitX = object2.getX();
+        }else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.right >= rect2.left && rect1.right <= rect2.right)
+        {
+            hitRegistered = HitLocation.Floor;
+            hitX = object2.getX();
+        }else if(rect1.bottom >= rect2.top && rect1.bottom <=rect2.bottom && rect1.left <= rect2.right && rect1.left >= rect2.left)
+        {
+            hitRegistered = HitLocation.Side;
+        }else if(rect1.bottom >= rect2.top && rect1.bottom <=rect2.bottom && rect1.right >= rect2.left && rect1.right <= rect2.right)
+        {
+            hitRegistered = HitLocation.Side;
         }
 
-
-
-        /*//if rect1 is first
-        if(checkRectangleCollision(rect1, rect2, result))
-        {
-            System.out.println(result.left + " " + result.top + " " + result.right + " "+ result.bottom);
-        }
-        //else rect2 is first
-        //
-        else if(checkRectangleCollision(rect2,rect1, result))
-        {
-            System.out.println(result.left + " " + result.top + " " + result.right + " "+ result.bottom);
-        }else
-        {
-            result.set(0,0,0,0);
-        }
-        test = result; //TODO delete
-        */
+        return hitRegistered;
     }
 
     public boolean checkRectangleCollision(Rect rect1, Rect rect2, Rect result)
