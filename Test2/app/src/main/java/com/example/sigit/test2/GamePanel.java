@@ -19,6 +19,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private MainThread thread;
     private GamePlayer player;
     private GameBall ball;
+    private GameHUD hud;
     private Point point;
     private Point winSize;
     //private List<GameBlock> blocks;
@@ -31,22 +32,29 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     {
         super(context);
 
+        //start game ticks
         getHolder().addCallback(this);
         thread = new MainThread(getHolder(), this);
         setFocusable(true);
 
-        //
+        //set window size
         winSize = size;
+
+        //setup player
         Point playerSize = new Point(winSize.x/5, winSize.y/50);
         player = new GamePlayer(new Rect(0,0,playerSize.x,playerSize.y), Color.rgb(255,0,0), winSize);
-        //player = new GamePlayer(new Rect(0,0,400,200), Color.rgb(255,0,0), winSize);
         point = new Point(winSize.x/2,winSize.y-winSize.y/10);
 
+        //setup ball
         Point ballPoint = new Point(point.x, point.y-50);
-        ball = new GameBall(ballPoint, winSize.y/50, Color.rgb(255,255,0), winSize);
+        ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(255,255,0), winSize);
 
+        //setup HUD
+        hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5), Color.GRAY);
+
+        //setup brick blocks
         blockSize = new Point(winSize.x/8, winSize.y/60);
-        nextBrickSpawnLocation = new Point(0,0);
+        nextBrickSpawnLocation = new Point(0,winSize.y/5);
 
         blocks =  new LinkedList<>();
         System.out.println("window width" + winSize.x);
@@ -55,8 +63,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         {
             spawnBlock();
         }
-        Rect test = player.boundingRect();
-        System.out.println("brick: left top " + test.left + " " + test.top +  " right bot " + test.right +" " + test.bottom);
+        //**********************
+
 
     }
 
@@ -111,6 +119,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawColor(Color.WHITE);
         player.draw(canvas);
         ball.draw(canvas);
+        hud.draw(canvas);
 
 
         for(GameBlock block : blocks)
@@ -122,11 +131,24 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     public void update()
     {
+        //call update on other game changing objects
         player.update(point);
         ball.update();
+        hud.update();
 
         HitLocation result = HitLocation.None;
+        //check collision with player
         result = checkCollision(player, ball);
+        if(result != HitLocation.None)
+        {
+            Vector vector = ball.getVector();
+            vector.transformVector(result);
+            ball.setVector(vector);
+            ball.increaseSpeed();
+        }
+
+        //check collision with hud
+        result = checkCollision(hud, ball);
         if(result != HitLocation.None)
         {
             Vector vector = ball.getVector();
@@ -134,6 +156,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             ball.setVector(vector);
         }
 
+        //check colliosion with bricks
         for(GameBlock block : blocks)
         {
             result = checkCollision(block, ball);
@@ -148,6 +171,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
 
+        //game end conditions
+        if(blocks.isEmpty())
+        {
+            //win condition
+        }
+        if(ball.isDead())
+        {
+            //loose condition
+        }
+
     }
 
     public HitLocation checkCollision(GameObject object1,GameBall object2)
@@ -160,10 +193,10 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         float hitX = 0;
 
         //if ball hits wall : range going diagnoly/horizontal from center to side
-        if(rect1.top-range <= rect2.top && rect2.bottom+range >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)// 2 hit right side
+        if(rect1.top-range <= rect2.top && rect1.bottom+range >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)// 2 hit right side
         {
             hitRegistered = HitLocation.Side;
-        }else if(rect1.top - range <= rect2.top && rect2.bottom +range >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//4 hit left side
+        }else if(rect1.top - range <= rect2.top && rect1.bottom +range >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//4 hit left side
         {
             hitRegistered = HitLocation.Side;
         }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.top >= rect2.top && rect1.top <= rect2.bottom)//1 hit top
@@ -177,18 +210,18 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //if ball hits wall: range cannot go diagnolly/horizontaly from center to side
         else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
-            //hitRegistered = HitLocation.Floor;
+            hitRegistered = HitLocation.Floor;
             hitX = object2.getX();
         }else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.right >= rect2.left && rect1.right <= rect2.right)
         {
-            //hitRegistered = HitLocation.Floor;
+            hitRegistered = HitLocation.Floor;
             hitX = object2.getX();
         }else if(rect1.bottom >= rect2.top && rect1.bottom <=rect2.bottom && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
-            //hitRegistered = HitLocation.Side;
+            hitRegistered = HitLocation.Side;
         }else if(rect1.bottom >= rect2.top && rect1.bottom <=rect2.bottom && rect1.right >= rect2.left && rect1.right <= rect2.right)
         {
-            //hitRegistered = HitLocation.Side;
+            hitRegistered = HitLocation.Side;
         }
 
         return hitRegistered;

@@ -7,18 +7,21 @@ import android.graphics.Rect;
 
 public class GameBall implements GameObject {
 
-
+    private boolean dead;
     private float x;
     private float y;
     private float range;
     private int color;
     private Paint paint;
     private Vector vector;
-    private int speed = 20;
+    private int speed = 1;
+    private int maxSpeed=60;
     private Point winSize;
 
     public GameBall(Point location, float range, int color, Point winSize)
     {
+        dead = false;
+
         x = location.x;
         y = location.y;
         this.range = range;
@@ -50,9 +53,8 @@ public class GameBall implements GameObject {
             //collision with wall
             if(x + range >= winSize.x){ vector.transformVector(HitLocation.Side);   }       //collides with right wall
             else if(x - range <= 0){ vector.transformVector(HitLocation.Side);  }           //collides with left wall
-            else if(y + range >= winSize.y){ vector.transformVector(HitLocation.Floor);  }  //collides with bottom wall
+            else if(y + range >= winSize.y){ vector.transformVector(HitLocation.Floor); dead = true;}  //collides with bottom wall
             else if(y - range <= 0){ vector.transformVector(HitLocation.Floor);  }          //collides with top wall
-
         }
     }
 
@@ -80,5 +82,16 @@ public class GameBall implements GameObject {
 
     public float getX() {
         return x;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+    public void increaseSpeed()
+    {
+        if(speed < maxSpeed)
+        {
+            ++speed;
+        }
     }
 }
