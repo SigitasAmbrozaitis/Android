@@ -13,7 +13,7 @@ import android.view.WindowManager;
 //TOD implement ball(optional:skins)
 //TOD implement player(optioanl:skins)
 //TOD implement player control(slide with finger/move with buttons < > or both) TODO optional: move with buttons
-//TODO implement ball collision with other objects
+//TOD implement ball collision with other objects
 //TOD implement ball colission with walls
 //TODO implement ball speed accelaration(depends on time or collision count)
 //TOD implement ball bounce angle calculation from walls mirrored
