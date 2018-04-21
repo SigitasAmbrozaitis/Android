@@ -1,6 +1,7 @@
 package com.example.sigit.test2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
+    private Context context;
     private MainThread thread;
     private GamePlayer player;
     private GameBall ball;
@@ -31,7 +33,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     GamePanel(Context context, Point size)
     {
         super(context);
-
+        this.context = context;
         //start game ticks
         getHolder().addCallback(this);
         thread = new MainThread(getHolder(), this);
@@ -43,7 +45,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //setup player
         Point playerSize = new Point(winSize.x/5, winSize.y/50);
         player = new GamePlayer(new Rect(0,0,playerSize.x,playerSize.y), Color.rgb(255,0,0), winSize);
-        point = new Point(winSize.x/2,winSize.y-winSize.y/10);
+        point = new Point(winSize.x/2,winSize.y-winSize.y/8);
 
         //setup ball
         Point ballPoint = new Point(point.x, point.y-50);
@@ -59,11 +61,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         blocks =  new LinkedList<>();
         System.out.println("window width" + winSize.x);
 
-        for(int i = 0; i<16; ++i)
+        for(int i = 0; i<24; ++i)
         {
             spawnBlock();
         }
         //**********************
+
 
 
     }
@@ -106,7 +109,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
-                point.set((int)event.getX(), winSize.y-winSize.y/10);
+                point.set((int)event.getX(), winSize.y-winSize.y/8);
                 break;
         }
         return true;
@@ -202,13 +205,32 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
 
         //game end conditions
-        if(blocks.isEmpty())
+        if(blocks.size() == 0)
         {
-            //win condition
+            //TODO fix game end condition so that it would end properly(check how blocks are generated)
+            System.out.println("Container is empty");
+
+            this.thread.setRunning(false);
+
+            Intent GameIntent = new Intent(context, ContinueActivity.class);
+            context.startActivity(GameIntent);
+
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
         }
         if(ball.isDead())
         {
             //loose condition
+            this.thread.setRunning(false);
+
+            //context.moveTaskToBack(true);
+
+
+            Intent GameIntent = new Intent(context, LooseActivity.class);
+            context.startActivity(GameIntent);
+
+            android.os.Process.killProcess(android.os.Process.myPid());
+            //System.exit(1);
         }
 
     }

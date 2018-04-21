@@ -70,8 +70,8 @@ public class GamePlayer implements GameObject {
         for(int i=0; i<speed; ++i)
         {
             if(rectangle.centerX()==point.x){break;}
-            if(point.x-rectangle.width()/2 < 0) { point.x = rectangle.width()/2; }                      //TODO fix gliching
-            if(point.x+rectangle.width()/2 > winSize.x) {point.x = winSize.x - rectangle.width()/2;}    //TODO fix gliching
+            if(point.x-rectangle.width()/2 < 0) { point.x = rectangle.width()/2; break;}
+            if(point.x+rectangle.width()/2 > winSize.x) {point.x = winSize.x - rectangle.width()/2; break;}
 
             Point centerPoint = new Point(rectangle.centerX()+((int)vector.getX()), rectangle.centerY());
             rectangle.set(  centerPoint.x - rectangle.width()/2 ,point.y - rectangle.height()/2, centerPoint.x +rectangle.width()/2 ,point.y + rectangle.height()/2);

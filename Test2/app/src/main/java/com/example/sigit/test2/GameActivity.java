@@ -22,11 +22,12 @@ import android.view.WindowManager;
 //TODO implement HUD showing score
 //TODO implement HUD shoving current level
 
-//TODO implement restart screen
-//TODO implement win screen
-//TODO implement level change
-//TODO implement better graphics(after gameplay works as intended
-
+//TOD implement restart screen
+//TOD implement win screen
+//TOD implement level change
+//TODO improve screen switch speed
+//TODO implement better graphics(after gameplay works as intended)
+//TODO fix collision gliches(not being able to keep up with ball speed)
 
 //TODO optional non-deatryoable blocks for harder levels
 //TODO multiple levels(10 or more)
