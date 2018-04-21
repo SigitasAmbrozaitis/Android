@@ -45,11 +45,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //setup player
         Point playerSize = new Point(winSize.x/5, winSize.y/50);
         player = new GamePlayer(new Rect(0,0,playerSize.x,playerSize.y), Color.rgb(255,0,0), winSize);
-        point = new Point(winSize.x/2,winSize.y-winSize.y/8);
+        point = new Point(winSize.x/2,winSize.y-winSize.y/7);
 
         //setup ball
         Point ballPoint = new Point(point.x, point.y-50);
-        ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(0,255,0), winSize);
+        ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(0,255,0), winSize, this);
 
         //setup HUD
         hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5), Color.GRAY);
@@ -109,7 +109,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
-                point.set((int)event.getX(), winSize.y-winSize.y/8);
+                point.set((int)event.getX(), winSize.y-winSize.y/7);
                 break;
         }
         return true;
@@ -139,69 +139,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ball.update();
         hud.update();
 
-        HitCoordinate coordinate = new HitCoordinate(0,new Rect(0,0,0,0));
-        HitLocation result = HitLocation.None;
-
-        //check collision with player
-        result = checkCollision(player, ball, coordinate);
-        if(result != HitLocation.None)
-        {
-            System.out.println(coordinate.calculateAngle());
-            if(coordinate.isChanged())
-            {
-                Vector vector = coordinate.getBounceVector();
-                //vector.addVector(player.getVector());
-                ball.setVector(vector);
-                coordinate.setChanged(false);
-            }else
-            {
-                Vector vector = ball.getVector();
-                vector.transformVector(result);
-                ball.setVector(vector);
-
-            }
-            ball.setHit(true);
-            ball.increaseSpeed();
-        }
-
-        //check collision with hud
-        result = checkCollision(hud, ball, coordinate);
-        if(result != HitLocation.None)
-        {
-            Vector vector = ball.getVector();
-            vector.transformVector(result);
-            ball.setVector(vector);
-            ball.setHit(true);
-        }
-
-        //check colliosion with bricks
-        GameBlock blockToDelete=null;
-        for(GameBlock block : blocks)
-        {
-            block.update();
-            result = checkCollision(block, ball, coordinate);
-            if(result != HitLocation.None)
-            {
-                Vector vector = ball.getVector();
-                vector.transformVector(result);
-                ball.setVector(vector);
-                ball.setHit(true);
-
-                block.setRectangle(new Rect(0,0,0,0));
-                blockToDelete = block;
-                //blocks.remove(block);
-            }
-
-
-        }
-        if(blockToDelete!=null)
-        {
-            blocks.remove(blockToDelete);
-            blockToDelete = null;
-        }
-
-
-
+        //checkCollision();
 
 
         //game end conditions
@@ -234,8 +172,74 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
 
     }
+    public void checkCollision()
+    {
+        HitCoordinate coordinate = new HitCoordinate(0,new Rect(0,0,0,0));
+        HitLocation result = HitLocation.None;
 
-    public HitLocation checkCollision(GameObject object1,GameBall object2, HitCoordinate coordinate)
+        //check collision with player
+        result = checkObjectCollision(player, ball, coordinate);
+        if(result != HitLocation.None)
+        {
+            System.out.println(coordinate.calculateAngle());
+            if(coordinate.isChanged())
+            {
+                Vector vector = coordinate.getBounceVector();
+                //vector.addVector(player.getVector());
+                ball.setVector(vector);
+                coordinate.setChanged(false);
+            }else
+            {
+                Vector vector = ball.getVector();
+                vector.transformVector(result);
+                ball.setVector(vector);
+
+            }
+            ball.setHit(true);
+            ball.increaseSpeed();
+        }
+
+
+        //check collision with hud
+        result = checkObjectCollision(hud, ball, coordinate);
+        if(result != HitLocation.None)
+        {
+            Vector vector = ball.getVector();
+            vector.transformVector(result);
+            ball.setVector(vector);
+            ball.setHit(true);
+        }
+
+        //check colliosion with bricks
+        GameBlock blockToDelete=null;
+        for(GameBlock block : blocks)
+        {
+            block.update();
+            result = checkObjectCollision(block, ball, coordinate);
+            if(result != HitLocation.None)
+            {
+                Vector vector = ball.getVector();
+                vector.transformVector(result);
+                ball.setVector(vector);
+                ball.setHit(true);
+
+                //block.setRectangle(new Rect(0,0,0,0));
+                blockToDelete = block;
+            }
+
+
+        }
+        if(blockToDelete!=null)
+        {
+            blockToDelete.setRectangle(new Rect(0,0,0,0));
+            blocks.remove(blockToDelete);
+            blockToDelete = null;
+        }
+
+    }
+
+
+    public HitLocation checkObjectCollision(GameObject object1,GameBall object2, HitCoordinate coordinate)
     {
         HitLocation hitRegistered = HitLocation.None;
         Rect rect1 = object1.boundingRect();
@@ -245,10 +249,10 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         float hitX = 0;
 
         //if ball hits wall : range going diagnoly/horizontal from center to side
-        if(rect1.top-range <= rect2.top && rect1.bottom+range >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)// 2 hit right side
+        if(rect1.top <= rect2.top && rect1.bottom >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)// 2 hit right side
         {
             hitRegistered = HitLocation.Side;
-        }else if(rect1.top - range <= rect2.top && rect1.bottom +range >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//4 hit left side
+        }else if(rect1.top <= rect2.top && rect1.bottom >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//4 hit left side
         {
             hitRegistered = HitLocation.Side;
         }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.top >= rect2.top && rect1.top <= rect2.bottom)//1 hit top

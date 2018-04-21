@@ -8,7 +8,7 @@ import android.graphics.Rect;
 
 public class GamePlayer implements GameObject {
 
-    private int speed = 100;
+    private int speed = 80;
     private Rect rectangle;
     private int color;
     private Paint paint;

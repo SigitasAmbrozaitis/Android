@@ -18,8 +18,9 @@ public class GameBall implements GameObject {
     private int maxSpeed=60;
     private Point winSize;
     private boolean hit = false;
+    private GamePanel panel;
 
-    public GameBall(Point location, float range, int color, Point winSize)
+    public GameBall(Point location, float range, int color, Point winSize, GamePanel panel)
     {
         dead = false;
 
@@ -28,6 +29,7 @@ public class GameBall implements GameObject {
         this.range = range;
         this.color = color;
         this.winSize = winSize;
+        this.panel = panel;
 
         paint = new Paint();
         paint.setColor(this.color);
@@ -52,6 +54,8 @@ public class GameBall implements GameObject {
             y += vector.getY();
 
             //collision with wall
+            panel.checkCollision();
+
             if(x + range >= winSize.x){ vector.transformVector(HitLocation.Side);   }       //collides with right wall
             else if(x - range <= 0){ vector.transformVector(HitLocation.Side);  }           //collides with left wall
             else if(y + range >= winSize.y){ vector.transformVector(HitLocation.Floor); dead = true;}  //collides with bottom wall
