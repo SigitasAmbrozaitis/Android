@@ -17,30 +17,33 @@ import java.util.List;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
-    private Context context;
-    private MainThread thread;
-    private GamePlayer player;
-    private GameBall ball;
-    private GameHUD hud;
-    private Point point;
-    private Point winSize;
-    //private List<GameBlock> blocks;
-    private LinkedList<GameBlock> blocks;
-    private Point blockSize;
-    private Point nextBrickSpawnLocation;
+    private Context context;    //game activiti, used for opening new activities or closing this
+    private MainThread thread;  //game thread
+    private GamePlayer player;  //player paddle
+    private GameBall ball;      //game ball
+    private GameHUD hud;        //hud
+    private Point point;        //point used to set player paddle location
+    private Point winSize;      //device screen parameters
+    private LinkedList<GameBlock> blocks;   //container of game blocks
+    private Point blockSize;                //block size parameters
+    private Point nextBrickSpawnLocation;   //next block spawn parameters
+    private int score=0;        //game score
+    private int blockWorth=100; //block worth
+    private int blockNumber= 24;//block number, how many there are generated
 
 
     GamePanel(Context context, Point size)
     {
         super(context);
-        this.context = context;
+
         //start game ticks
         getHolder().addCallback(this);
         thread = new MainThread(getHolder(), this);
         setFocusable(true);
 
-        //set window size
+        //set game parameters
         winSize = size;
+        this.context = context;
 
         //setup player
         Point playerSize = new Point(winSize.x/5, winSize.y/50);
@@ -52,23 +55,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(0,255,0), winSize, this);
 
         //setup HUD
-        hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5), Color.GRAY);
+        hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5));
 
         //setup brick blocks
         blockSize = new Point(winSize.x/8, winSize.y/60);
         nextBrickSpawnLocation = new Point(0,winSize.y/5);
-
         blocks =  new LinkedList<>();
-        System.out.println("window width" + winSize.x);
-
-        for(int i = 0; i<24; ++i)
+        for(int i = 0; i<blockNumber; ++i)
         {
             spawnBlock();
         }
-        //**********************
-
-
-
     }
 
     @Override
@@ -80,7 +76,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
-
+        //launch main thread
         thread = new MainThread(getHolder(), this);
         thread.setRunning(true);
         thread.start();
@@ -88,6 +84,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder)
     {
+        //stop thread untill its stopped
         boolean retry = true;
         while(retry)
         {
@@ -105,6 +102,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+        //handle player input
         switch(event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
@@ -118,18 +116,18 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas)
     {
+        //redraw all objects in view
         super.draw(canvas);
+
         canvas.drawColor(Color.WHITE);
         player.draw(canvas);
         ball.draw(canvas);
         hud.draw(canvas);
 
-
         for(GameBlock block : blocks)
         {
             block.draw(canvas);
         }
-
     }
 
     public void update()
@@ -139,100 +137,106 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ball.update();
         hud.update();
 
-        //checkCollision();
-
+        //set hud score
+        hud.setScore(score);
 
         //game end conditions
-        if(blocks.size() == 0)
+        if(blockNumber == 0)
         {
-            //TODO fix game end condition so that it would end properly(check how blocks are generated)
-            System.out.println("Container is empty");
-
+            //stop thread
             this.thread.setRunning(false);
 
+            //open new window
             Intent GameIntent = new Intent(context, ContinueActivity.class);
             context.startActivity(GameIntent);
 
+            //close old window
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
         }
+        //loose condition
         if(ball.isDead())
         {
-            //loose condition
+            //stop thread
             this.thread.setRunning(false);
 
-            //context.moveTaskToBack(true);
-
-
+            //open new window
             Intent GameIntent = new Intent(context, LooseActivity.class);
             context.startActivity(GameIntent);
 
+            //close old window
             android.os.Process.killProcess(android.os.Process.myPid());
-            //System.exit(1);
+            System.exit(1);
         }
 
     }
     public void checkCollision()
     {
         HitCoordinate coordinate = new HitCoordinate(0,new Rect(0,0,0,0));
-        HitLocation result = HitLocation.None;
-
+        HitLocation result;
         //check collision with player
         result = checkObjectCollision(player, ball, coordinate);
+
+        //haandle collision with player
         if(result != HitLocation.None)
         {
-            System.out.println(coordinate.calculateAngle());
+            //if hits paddle top
             if(coordinate.isChanged())
             {
                 Vector vector = coordinate.getBounceVector();
-                //vector.addVector(player.getVector());
                 ball.setVector(vector);
                 coordinate.setChanged(false);
-            }else
+            }
+            //if hits soething else
+            else
             {
                 Vector vector = ball.getVector();
                 vector.transformVector(result);
                 ball.setVector(vector);
 
             }
-            ball.setHit(true);
+            //increase ball speed
             ball.increaseSpeed();
         }
 
 
         //check collision with hud
         result = checkObjectCollision(hud, ball, coordinate);
+
+        //handle collision with hud
         if(result != HitLocation.None)
         {
+            //mirror ball vector if hit
             Vector vector = ball.getVector();
             vector.transformVector(result);
             ball.setVector(vector);
-            ball.setHit(true);
         }
 
         //check colliosion with bricks
         GameBlock blockToDelete=null;
         for(GameBlock block : blocks)
         {
-            block.update();
             result = checkObjectCollision(block, ball, coordinate);
             if(result != HitLocation.None)
             {
+                //mirror ball vector if hit
                 Vector vector = ball.getVector();
                 vector.transformVector(result);
                 ball.setVector(vector);
-                ball.setHit(true);
 
-                //block.setRectangle(new Rect(0,0,0,0));
+                //set block to delete
                 blockToDelete = block;
+                break;
             }
-
-
         }
+        //dlete set block
         if(blockToDelete!=null)
         {
+            score += blockWorth;
             blockToDelete.setRectangle(new Rect(0,0,0,0));
             blocks.remove(blockToDelete);
+            --blockNumber;
+            System.out.println("size:" +blockNumber);
             blockToDelete = null;
         }
 
@@ -246,21 +250,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         Rect rect2 = object2.boundingRect();
         float range = object2.getRange();
 
-        float hitX = 0;
-
         //if ball hits wall : range going diagnoly/horizontal from center to side
-        if(rect1.top <= rect2.top && rect1.bottom >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)// 2 hit right side
+        if(rect1.top <= rect2.top && rect1.bottom >= rect2.bottom && rect1.right <= rect2.right && rect1.right >= rect2.left)//hit right side
         {
             hitRegistered = HitLocation.Side;
-        }else if(rect1.top <= rect2.top && rect1.bottom >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//4 hit left side
+        }else if(rect1.top <= rect2.top && rect1.bottom >= rect2.bottom && rect1.left >= rect2.left && rect1.left <= rect2.right)//hit left side
         {
             hitRegistered = HitLocation.Side;
-        }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.top >= rect2.top && rect1.top <= rect2.bottom)//1 hit top
+        }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.top >= rect2.top && rect1.top <= rect2.bottom)//hit top
         {
             hitRegistered = HitLocation.Floor;
             coordinate.setHitCoordinate(object2.getX(),new Rect(rect1.left, rect1.top, rect1.right, rect1.bottom));
 
-        }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.bottom <= rect2.bottom && rect1.bottom >= rect2.top)//3 hit bot
+        }else if(rect1.left-range <= rect2.left && rect1.right+range >= rect2.right && rect1.bottom <= rect2.bottom && rect1.bottom >= rect2.top)//hit bot
         {
             hitRegistered = HitLocation.Floor;
         }
@@ -268,11 +270,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
             hitRegistered = HitLocation.Floor;
-            //coordinate = new HitCoordinate(object2.getX(),rect1);
         }else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.right >= rect2.left && rect1.right <= rect2.right)
         {
             hitRegistered = HitLocation.Floor;
-            //coordinate = new HitCoordinate(object2.getX(),rect1);
         }else if(rect1.bottom >= rect2.top && rect1.bottom <=rect2.bottom && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
             hitRegistered = HitLocation.Side;
@@ -286,27 +286,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     public void spawnBlock()
     {
+        //spawn new block
         Rect spawnRectangle = new Rect(nextBrickSpawnLocation.x, nextBrickSpawnLocation.y, nextBrickSpawnLocation.x+blockSize.x, nextBrickSpawnLocation.y+blockSize.y);
-        //System.out.println("brick location: " + nextBrickSpawnLocation.x + " " + nextBrickSpawnLocation.y);
-        //System.out.println("brick size:" + blockSize.x + " " + blockSize.y);
-
-
         GameBlock block = new GameBlock(spawnRectangle, Color.BLUE, winSize);
-        //Rect test = block.boundingRect();
-        //System.out.println("brick: left top " + test.left + " " + test.top +  " right bot " + test.right +" " + test.bottom);
-
         blocks.addLast(block);
-        System.out.println(blocks.size());
 
-        if(nextBrickSpawnLocation.x + blockSize.x <= winSize.x)
+        //calculate next block position
+        if(nextBrickSpawnLocation.x + blockSize.x < winSize.x)
         {
             nextBrickSpawnLocation.set(nextBrickSpawnLocation.x + blockSize.x, nextBrickSpawnLocation.y);
         }else
         {
             nextBrickSpawnLocation.set(0, nextBrickSpawnLocation.y+blockSize.y);
         }
-
-
 
     }
 

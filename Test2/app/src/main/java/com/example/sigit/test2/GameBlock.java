@@ -7,51 +7,54 @@ import android.graphics.Rect;
 
 public class GameBlock implements GameObject {
 
-    private Vector vector;
-    private Rect rectangle;
-    private int color;
-    private Point winSize;
-    private Paint paint;
+    private Vector vector;  //block vector, TODO delete if bounce vector does not add moving vector
+    private Rect rectangle; //block size parameters and laction
+    private int color;      //block color TODO delete if image is used
+    private Point winSize;  //device window size
+    private Paint paint;    //block pait
 
     public GameBlock(Rect rectangle, int color, Point winSize)
     {
+        //set private variables
         this.vector = new Vector(0,0);
         this.rectangle = rectangle;
         this.color =color;
         this.winSize = winSize;
 
+        //create new paint
         paint = new Paint();
         paint.setColor(color);
     }
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas)
+    {
         canvas.drawRect(rectangle,paint);
     }
 
     @Override
-    public void update() {
+    public void update()
+    {
 
     }
 
     @Override
-    public Rect boundingRect() {
+    public Rect boundingRect()
+    {
         return rectangle;
     }
 
     @Override
-    public Vector getVector() {
+    public Vector getVector()
+    {
         return vector;
     }
 
     @Override
-    public void setVector(Vector vector) {
+    public void setVector(Vector vector)
+    {
         this.vector = vector;
     }
 
-    public void setLocation(int x, int y)
-    {
-        rectangle.set(x, y , x+rectangle.width(), y+rectangle.height());
-    }
     public void setRectangle(Rect rect)
     {
         rectangle = rect;

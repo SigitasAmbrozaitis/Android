@@ -14,6 +14,7 @@ public class LooseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -24,16 +25,13 @@ public class LooseActivity extends AppCompatActivity {
         {
             public void onClick(View v)
             {
-
-                //moveTaskToBack(true);
-
-
-
+                //open new window
                 Intent GameIntent = new Intent(LooseActivity.this, GameActivity.class);
                 startActivity(GameIntent);
 
+                //close old window
                 android.os.Process.killProcess(android.os.Process.myPid());
-                //System.exit(1);
+                System.exit(1);
 
             }
         });
@@ -43,6 +41,7 @@ public class LooseActivity extends AppCompatActivity {
         {
             public void onClick(View v)
             {
+                //close windows
                 moveTaskToBack(true);
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(1);

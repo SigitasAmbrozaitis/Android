@@ -19,9 +19,11 @@ public class ContinueActivity extends AppCompatActivity {
         {
             public void onClick(View v)
             {
+                //start new window
                 Intent GameIntent = new Intent(ContinueActivity.this, GameActivity.class);
                 startActivity(GameIntent);
 
+                //close old window
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(1);
             }
@@ -32,6 +34,7 @@ public class ContinueActivity extends AppCompatActivity {
         {
             public void onClick(View v)
             {
+                //close all procesess
                 moveTaskToBack(true);
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(1);

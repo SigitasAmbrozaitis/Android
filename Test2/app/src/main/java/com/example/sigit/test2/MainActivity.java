@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         {
             public void onClick(View v)
             {
+                //close all windows
                 moveTaskToBack(true);
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(1);
@@ -32,8 +33,11 @@ public class MainActivity extends AppCompatActivity {
         {
             public void onClick(View v)
             {
+                //open new window
                 Intent GameIntent = new Intent(MainActivity.this, GameActivity.class);
                 startActivity(GameIntent);
+
+
             }
         });
     }

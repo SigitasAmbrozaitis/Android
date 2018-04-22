@@ -15,10 +15,7 @@ public class Vector {
     public void setX(float x) {
         this.x = x;
     }
-    public void setY(float y)
-    {
-        this.y = y;
-    }
+
 
     public float getX() {
         return x;
@@ -35,25 +32,14 @@ public class Vector {
     }
     public void converToSingle()
     {
-        float max = 0;
-        if(x < y)
-        {
-            max = y;
-        }else
-        {
-            max = x;
-        }
-        if(max>1)
-        {
-            x = x/max;
-            y = y/max;
-        }
+        //TODO implement or delete
     }
     public void addVector(Vector vector)
     {
         this.x += vector.getX();
         this.y += vector.getY();
         converToSingle();
+        //TODO delte if not used
     }
     public void setVector(float x, float y)
     {

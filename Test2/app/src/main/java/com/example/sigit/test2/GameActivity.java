@@ -19,15 +19,28 @@ import android.view.WindowManager;
 //TOD implement ball bounce angle calculation from walls mirrored
 //TOD implement ball bounce angle calculation from block mirrored
 //TOD implement ball bounce angle calculation from player(ball vector + player vector and invert or every different point from player center has increasedingly bigger angle)
-//TODO implement HUD showing score
+//TOD implement HUD showing score
 //TODO implement HUD shoving current level
-
+//TOD fix painting error of HUD rectangle(color always black)
+//TOD fix bounce from player`s right side
+//TOD
+// fix errors with game not being able to end when won
+//TOD fix collision gliches(not being able to keep up with ball speed)
 //TOD implement restart screen
 //TOD implement win screen
 //TOD implement level change
 //TODO improve screen switch speed
+
 //TODO implement better graphics(after gameplay works as intended)
-//TODO fix collision gliches(not being able to keep up with ball speed)
+//TODO Start window
+//TODO Loose window
+//TODO Continue Window
+//TODO HUD
+//TODO Player
+//TODO Ball
+//TODO Bricks
+//TODO Background
+
 
 //TODO optional non-deatryoable blocks for harder levels
 //TODO multiple levels(10 or more)

@@ -4,23 +4,28 @@ import android.graphics.Rect;
 
 public class HitCoordinate {
 
-    private float x;
+    private float x;        //x coordintate shows where the ball hit paddle
     private Vector vector;
-    private Rect rectangle;
-    boolean changed = false;
+    private Rect rectangle; //hit object parameters
+    boolean changed = false;//true if hit coordinate was changed
 
     public HitCoordinate(float x, Rect hitObject)
     {
+        //setting private variables
+        this.x = x;
+        this.rectangle = hitObject;
 
-       this.x = x;
-       this.rectangle = hitObject;
-       vector = new Vector(0,0);
+        //creating new vector;
+        vector = new Vector(0,0);
     }
 
     public void setHitCoordinate(float x, Rect hitObject)
     {
+        //setting private variables
         this.x = x;
         this.rectangle = hitObject;
+
+        //setting that object was changed
         changed = true;
     }
 
@@ -46,11 +51,7 @@ public class HitCoordinate {
         rectangle.set((int)(rectangle.left-center),0, (int)(rectangle.right-center)  , 0);
         center = 0;
 
-        System.out.println("cell: " + cell + "hit: " + x + " rectangle " + rectangle.left + " " + rectangle.right + " center " + center);
-
         //get what centerside the hit was in
-        float factor = 1;
-        if(x<center) { factor = -1;}
 
         int angle=0;
         for(int i=1; i<9; ++i)
@@ -64,7 +65,7 @@ public class HitCoordinate {
                 }
             }else//right side
             {
-                if(i*cell< x)
+                if(i*cell> x)
                 {
                     angle = i;
                     break;
@@ -77,55 +78,55 @@ public class HitCoordinate {
     {
         switch(angle)
         {
-            case -8:
+            case -8:    //10
                 vector.setVector(-1,-0.25f);
                 break;
-            case -7:
+            case -7:    //20
                 vector.setVector(-1,-0.375f);
                 break;
-            case -6:
+            case -6:    //30
                 vector.setVector(-1,-0.6f);
                 break;
-            case -5:
+            case -5:    //40
                 vector.setVector(-1,-0.857f);
                 break;
-            case -4:
+            case -4:    //50
                 vector.setVector(-0.833f,-1);
                 break;
-            case -3:
+            case -3:    //60
                 vector.setVector(-0.571f, -1);
                 break;
-            case -2:
+            case -2:    //70
                 vector.setVector(-0.375f, -1);
                 break;
-            case -1:
+            case -1:    //80
                 vector.setVector(-0.181f,-1);
                 break;
-            case 0:
+            case 0:     //90
                 vector.setVector(0,-1);
                 break;
-            case 1:
+            case 1:     //80
                 vector.setVector(0.181f,-1);
                 break;
-            case 2:
+            case 2:     //70
                 vector.setVector(0.375f, -1);
                 break;
-            case 3:
+            case 3:     //60
                 vector.setVector(0.571f, -1);
                 break;
-            case 4:
+            case 4:     //50
                 vector.setVector(0.833f,-1);
                 break;
-            case 5:
+            case 5:     //40
                 vector.setVector(1,-0.857f);
                 break;
-            case 6:
+            case 6:     //30
                 vector.setVector(1,-0.6f);
                 break;
-            case 7:
+            case 7:     //20
                 vector.setVector(1,-0.375f);
                 break;
-            case 8:
+            case 8:     //10
                 vector.setVector(1,-0.25f);
                 break;
         }
