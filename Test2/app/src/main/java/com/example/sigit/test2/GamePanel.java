@@ -2,18 +2,19 @@ package com.example.sigit.test2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.constraint.solver.widgets.Rectangle;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.LinkedList;
-import java.util.List;
+
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -30,6 +31,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private int score=0;        //game score
     private int blockWorth=100; //block worth
     private int blockNumber= 24;//block number, how many there are generated
+    private Bitmap Background;
 
 
     GamePanel(Context context, Point size)
@@ -47,15 +49,15 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         //setup player
         Point playerSize = new Point(winSize.x/5, winSize.y/50);
-        player = new GamePlayer(new Rect(0,0,playerSize.x,playerSize.y), Color.rgb(255,0,0), winSize);
+        player = new GamePlayer(new Rect(0,0,playerSize.x,playerSize.y), winSize, context);
         point = new Point(winSize.x/2,winSize.y-winSize.y/7);
 
         //setup ball
         Point ballPoint = new Point(point.x, point.y-50);
-        ball = new GameBall(ballPoint, winSize.y/100, Color.rgb(0,255,0), winSize, this);
+        ball = new GameBall(ballPoint, winSize.y/100, winSize, this);
 
         //setup HUD
-        hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5));
+        hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5), context);
 
         //setup brick blocks
         blockSize = new Point(winSize.x/8, winSize.y/60);
@@ -65,6 +67,10 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         {
             spawnBlock();
         }
+
+        //setup background image
+        Background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+
     }
 
     @Override
@@ -119,7 +125,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //redraw all objects in view
         super.draw(canvas);
 
-        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(Background, 0 , 0 ,null);
+
         player.draw(canvas);
         ball.draw(canvas);
         hud.draw(canvas);
@@ -177,7 +184,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //check collision with player
         result = checkObjectCollision(player, ball, coordinate);
 
-        //haandle collision with player
+        //handle collision with player
         if(result != HitLocation.None)
         {
             //if hits paddle top
@@ -212,7 +219,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             ball.setVector(vector);
         }
 
-        //check colliosion with bricks
+        //check collision with bricks
         GameBlock blockToDelete=null;
         for(GameBlock block : blocks)
         {
@@ -229,14 +236,13 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 break;
             }
         }
-        //dlete set block
+        //delete set block
         if(blockToDelete!=null)
         {
             score += blockWorth;
             blockToDelete.setRectangle(new Rect(0,0,0,0));
             blocks.remove(blockToDelete);
             --blockNumber;
-            System.out.println("size:" +blockNumber);
             blockToDelete = null;
         }
 
@@ -288,7 +294,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     {
         //spawn new block
         Rect spawnRectangle = new Rect(nextBrickSpawnLocation.x, nextBrickSpawnLocation.y, nextBrickSpawnLocation.x+blockSize.x, nextBrickSpawnLocation.y+blockSize.y);
-        GameBlock block = new GameBlock(spawnRectangle, Color.BLUE, winSize);
+        GameBlock block = new GameBlock(spawnRectangle, context);
         blocks.addLast(block);
 
         //calculate next block position

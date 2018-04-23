@@ -1,6 +1,9 @@
 package com.example.sigit.test2;
 
 import android.arch.lifecycle.OnLifecycleEvent;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -10,31 +13,37 @@ public class GamePlayer implements GameObject {
 
     private int speed = 80; //paddle speed
     private Rect rectangle; //player size and location parameters
-    private int color;      //player paint color
-    private Paint paint;    //player paint
+    //private int color;      //player paint color
+    //private Paint paint;    //player paint
     private Vector vector;  //player movement vector
     private Point winSize;  //device screen parameters
+    private Bitmap Paddle;
 
 
-    public GamePlayer(Rect rectangle, int color, Point winSize)
+    public GamePlayer(Rect rectangle, Point winSize, Context context)
     {
         //set private variables
         this.rectangle = rectangle;
-        this.color = color;
+        //this.color = color;
         this.winSize = winSize;
 
         //create new paint
-        paint = new Paint();
-        paint.setColor(color);
+        //paint = new Paint();
+        //paint.setColor(color);
 
         //create new vector
         vector = new Vector(0,0);
+
+        speed = winSize.y/25;
+
+        Paddle = BitmapFactory.decodeResource(context.getResources(), R.drawable.paddle);
     }
 
     @Override
     public void draw(Canvas canvas)
     {
-        canvas.drawRect(rectangle,paint);
+        //canvas.drawRect(rectangle,paint);
+        canvas.drawBitmap(Paddle, null, rectangle, null);
     }
 
     @Override

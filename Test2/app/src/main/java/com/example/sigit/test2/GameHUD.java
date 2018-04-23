@@ -1,5 +1,8 @@
 package com.example.sigit.test2;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,11 +21,13 @@ public class GameHUD implements GameObject {
     private int textColor;  //hud text color
     private int score=0;    //game score
     private static int level;//game level TODO implement
+    private Rect textRectangle;
+    private Bitmap hudBackground;
 
 
 
 
-    public GameHUD(Rect rectangle)
+    public GameHUD(Rect rectangle, Context context)
     {
         //set loaction and color
         this.rectangle = rectangle;
@@ -36,20 +41,26 @@ public class GameHUD implements GameObject {
         paint.setColor(color);
         paint.setAntiAlias(true);
 
+        hudBackground =  BitmapFactory.decodeResource(context.getResources(), R.drawable.hudbackground);
+
         //create text paint and set its parameters
         textColor = Color.rgb(255,0,0);
         textPaint = new Paint();
         textPaint.setColor(textColor);
         textPaint.setAntiAlias(true);
-        textPaint.setTextSize(100);
+        textPaint.setTextSize(30);
+
     }
 
     @Override
     public void draw(Canvas canvas)
     {
-        canvas.drawRect(rectangle, paint);
-        canvas.drawText("Ponts: " + score, rectangle.right/2,rectangle.bottom/4*3, textPaint);
-        canvas.drawText("Level: " + level, rectangle.right/2, rectangle.bottom/4, textPaint);
+
+        canvas.drawBitmap(hudBackground, null, rectangle, null);
+        //canvas.drawRect(textRectangle, paint);
+
+        canvas.drawText("Points: " + score, rectangle.right/2+170,rectangle.bottom/4*2, textPaint);
+        canvas.drawText("Level : " + level, rectangle.right/2+170, rectangle.bottom/4*3, textPaint);
 
     }
 

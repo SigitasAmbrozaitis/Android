@@ -79,55 +79,55 @@ public class HitCoordinate {
         switch(angle)
         {
             case -8:    //10
-                vector.setVector(-1,-0.25f);
+                vector.setVector(-0.97f,-0.242f);
                 break;
             case -7:    //20
-                vector.setVector(-1,-0.375f);
+                vector.setVector(-0.936f,-0.351f);
                 break;
             case -6:    //30
-                vector.setVector(-1,-0.6f);
+                vector.setVector(-0.857f,-0.514f);
                 break;
             case -5:    //40
-                vector.setVector(-1,-0.857f);
+                vector.setVector(-0.759f,-0.65f);
                 break;
             case -4:    //50
-                vector.setVector(-0.833f,-1);
+                vector.setVector(-0.639f,-0.768f);
                 break;
             case -3:    //60
-                vector.setVector(-0.571f, -1);
+                vector.setVector(-0.495f, -0.868f);
                 break;
             case -2:    //70
-                vector.setVector(-0.375f, -1);
+                vector.setVector(-0.351f, -0.936f);
                 break;
             case -1:    //80
-                vector.setVector(-0.181f,-1);
+                vector.setVector(-0.178f,-0.984f);
                 break;
             case 0:     //90
                 vector.setVector(0,-1);
                 break;
             case 1:     //80
-                vector.setVector(0.181f,-1);
+                vector.setVector(0.178f,-0.984f);
                 break;
             case 2:     //70
-                vector.setVector(0.375f, -1);
+                vector.setVector(0.351f, -0.936f);
                 break;
             case 3:     //60
-                vector.setVector(0.571f, -1);
+                vector.setVector(0.495f, -0.868f);
                 break;
             case 4:     //50
-                vector.setVector(0.833f,-1);
+                vector.setVector(0.639f,-0.768f);
                 break;
             case 5:     //40
-                vector.setVector(1,-0.857f);
+                vector.setVector(0.759f,-0.65f);
                 break;
             case 6:     //30
-                vector.setVector(1,-0.6f);
+                vector.setVector(0.857f,-0.514f);
                 break;
             case 7:     //20
-                vector.setVector(1,-0.375f);
+                vector.setVector(0.936f,-0.351f);
                 break;
             case 8:     //10
-                vector.setVector(1,-0.25f);
+                vector.setVector(0.97f,-0.243f);
                 break;
         }
     }

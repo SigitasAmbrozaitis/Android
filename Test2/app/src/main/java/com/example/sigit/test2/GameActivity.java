@@ -31,15 +31,15 @@ import android.view.WindowManager;
 //TOD implement level change
 //TODO improve screen switch speed
 
-//TODO implement better graphics(after gameplay works as intended)
-//TODO Start window
-//TODO Loose window
-//TODO Continue Window
-//TODO HUD
-//TODO Player
-//TODO Ball
-//TODO Bricks
-//TODO Background
+//TOD implement better graphics(after gameplay works as intended)
+//TOD Start window
+//TOD Loose window
+//TOD Continue Window
+//TOD HUD
+//TOD Player
+//TOD Ball
+//TOD Bricks
+//TOD Background
 
 
 //TODO optional non-deatryoable blocks for harder levels
