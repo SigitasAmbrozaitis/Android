@@ -35,23 +35,10 @@ public class GameBlock implements GameObject {
     {
 
     }
-
     @Override
     public Rect boundingRect()
     {
         return rectangle;
-    }
-
-    @Override
-    public Vector getVector()
-    {
-        return vector;
-    }
-
-    @Override
-    public void setVector(Vector vector)
-    {
-        this.vector = vector;
     }
 
     public void setRectangle(Rect rect)

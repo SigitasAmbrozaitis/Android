@@ -56,16 +56,6 @@ public class GamePlayer implements GameObject {
     {
         return rectangle;
     }
-    @Override
-    public Vector getVector()
-    {
-        return vector;
-    }
-    @Override
-    public void setVector(Vector vector)
-    {
-        this.vector = vector;
-    }
 
     public void update(Point point)
     {

@@ -2,6 +2,7 @@ package com.example.sigit.test2;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,11 +22,16 @@ public class LooseActivity extends Activity {
 
         setContentView(R.layout.activity_loose);
 
+        final MediaPlayer menuMusic = MediaPlayer.create(this, R.raw.menumusic);
+        menuMusic.setLooping(true);
+        menuMusic.start();
+
         final Button RetryButton = findViewById(R.id.RetryButton);
         RetryButton.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
+                menuMusic.stop();
                 //open new window
                 Intent GameIntent = new Intent(LooseActivity.this, GameActivity.class);
                 startActivity(GameIntent);
@@ -42,6 +48,8 @@ public class LooseActivity extends Activity {
         {
             public void onClick(View v)
             {
+
+                menuMusic.stop();
                 //close windows
                 moveTaskToBack(true);
                 android.os.Process.killProcess(android.os.Process.myPid());

@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
+import android.provider.MediaStore;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -30,8 +32,15 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private Point nextBrickSpawnLocation;   //next block spawn parameters
     private int score=0;        //game score
     private int blockWorth=100; //block worth
-    private int blockNumber= 24;//block number, how many there are generated
+    private int blockNumber= 80;//block number, how many there are generated
     private Bitmap Background;
+    int lives = 3;
+
+    //sounds
+    private MediaPlayer brickSound;
+    private MediaPlayer paddleSound;
+    private MediaPlayer backgroundMusic;
+
 
 
     GamePanel(Context context, Point size)
@@ -58,6 +67,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         //setup HUD
         hud = new GameHUD(new Rect(0,0, winSize.x, winSize.y/5), context);
+        hud.setLives(lives);
 
         //setup brick blocks
         blockSize = new Point(winSize.x/8, winSize.y/60);
@@ -70,6 +80,13 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         //setup background image
         Background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+
+        //setup sounds
+        brickSound = MediaPlayer.create(context, R.raw.bricksound);
+        paddleSound = MediaPlayer.create(context, R.raw.paddlesound);
+        backgroundMusic = MediaPlayer.create(context, R.raw.backgroundmusic);
+        backgroundMusic.setLooping(true);
+        backgroundMusic.start();
 
     }
 
@@ -125,7 +142,10 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //redraw all objects in view
         super.draw(canvas);
 
+
         canvas.drawBitmap(Background, 0 , 0 ,null);
+
+
 
         player.draw(canvas);
         ball.draw(canvas);
@@ -146,6 +166,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         //set hud score
         hud.setScore(score);
+        hud.setLives(lives);
+
 
         //game end conditions
         if(blockNumber == 0)
@@ -172,6 +194,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             context.startActivity(GameIntent);
 
             //close old window
+            backgroundMusic.stop();
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
         }
@@ -202,8 +225,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 ball.setVector(vector);
 
             }
+            paddleSound.start();
             //increase ball speed
-            ball.increaseSpeed();
+            //ball.increaseSpeed();
         }
 
 
@@ -231,6 +255,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 vector.transformVector(result);
                 ball.setVector(vector);
 
+                brickSound.start();
                 //set block to delete
                 blockToDelete = block;
                 break;
@@ -272,7 +297,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         {
             hitRegistered = HitLocation.Floor;
         }
-        //if ball hits wall: range cannot go diagnolly/horizontaly from center to side
+        //if ball hits wall: range cannot go diagnolly / horizontaly from center to side
         else if(rect1.top <= rect2.bottom && rect1.top >=rect2.top && rect1.left <= rect2.right && rect1.left >= rect2.left)
         {
             hitRegistered = HitLocation.Floor;
@@ -307,5 +332,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
 
     }
+    public void decreaseLives()
+    {
+        --lives;
+    }
+
+    public int getLives()
+    {
+        return lives;
+    }
+    public GamePlayer getPlayer()
+    {
+        return player;
+    }
+
 
 }
